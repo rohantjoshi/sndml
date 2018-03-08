@@ -1,0 +1,39 @@
+function getPattern (obj, pattern){
+		
+		if(typeof obj === "string"){
+			obj = new JSON().decode(obj);
+		}
+		
+		if(typeof pattern !== "string"){
+			throw "invalid_pattern";
+		}
+		
+		var field_names = pattern.split(".");
+		var current_key_name = field_names[0];
+		
+		var is_array_regex = /\[([\d]?)\]/;
+		var is_array = is_array_regex.exec(current_key_name);
+		
+		// if we have an array look up in the  keyword.
+		if(!JSUtil.nil(is_array)){
+			obj = obj[is_array[1] * 1];
+		}
+		
+		// if we dont have an array in the keyword.
+		if(JSUtil.nil(is_array)){
+			obj = obj[current_key_name];
+		}
+		
+		
+		if(field_names.length === 1){
+			return obj;
+		}
+		
+		// remove the first keyword, which we just acted upon.
+		field_names.shift();
+		
+		// if none of the conditions match, then call the same function recursively. . .
+		return getPattern(obj, field_names.join('.'));
+		
+	}
+	
